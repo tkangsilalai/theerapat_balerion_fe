@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { login } from "@/features/auth/auth";
 
 type Props = {
   onLoginSuccess: (customerId: string) => void;
@@ -28,7 +29,6 @@ function formatCredit(x: number): string {
 }
 
 export default function LoginPage({ onLoginSuccess }: Props) {
-  const [customerId, setCustomerId] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const [pickQuery, setPickQuery] = useState("");
@@ -44,26 +44,16 @@ export default function LoginPage({ onLoginSuccess }: Props) {
     );
   }, [pickQuery, users]);
 
-  function handleManualLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-
-    const id = customerId.trim().toUpperCase();
-
-    const user = users.find((u) => u.customerId === id);
-    if (!user) {
-      setError("Customer ID not found. Use 'Pick customer' to select.");
-      return;
-    }
-
-    onLoginSuccess(user.customerId);
-  }
-
   function handlePick(user: User) {
     setError(null);
-    setCustomerId(user.customerId);
     setDialogOpen(false);
-    onLoginSuccess(user.customerId);
+
+    try {
+      login(user.customerId);
+      onLoginSuccess(user.customerId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    }
   }
 
   return (
@@ -75,74 +65,71 @@ export default function LoginPage({ onLoginSuccess }: Props) {
         </CardHeader>
 
         <CardContent className="flex items-center justify-center">
-          <form onSubmit={handleManualLogin}>
-            {error && <div>{error}</div>}
+          {error && <div>{error}</div>}
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="text-lg cursor-pointer" type="button">
+                Pick customer
+              </Button>
+            </DialogTrigger>
 
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="text-lg cursor-pointer" type="button">
-                  Pick customer
-                </Button>
-              </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Select a customer</DialogTitle>
+              </DialogHeader>
 
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Select a customer</DialogTitle>
-                </DialogHeader>
+              <Input
+                placeholder="Search by CT-XXXX or name…"
+                value={pickQuery}
+                onChange={(e) => setPickQuery(e.target.value)}
+                autoComplete="off"
+              />
 
-                <Input
-                  placeholder="Search by CT-XXXX or name…"
-                  value={pickQuery}
-                  onChange={(e) => setPickQuery(e.target.value)}
-                  autoComplete="off"
-                />
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Customer ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead className="text-right">Credit</TableHead>
+                  </TableRow>
+                </TableHeader>
 
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Customer ID</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead className="text-right">Credit</TableHead>
+                <TableBody>
+                  {filtered.map((u) => (
+                    <TableRow
+                      key={u.customerId}
+                      role="button"
+                      tabIndex={0}
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handlePick(u)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") handlePick(u);
+                      }}
+                    >
+                      <TableCell className="font-mono">{u.customerId}</TableCell>
+                      <TableCell>{u.name}</TableCell>
+                      <TableCell className="text-right">{formatCredit(u.credit)}</TableCell>
                     </TableRow>
-                  </TableHeader>
+                  ))}
 
-                  <TableBody>
-                    {filtered.map((u) => (
-                      <TableRow
-                        key={u.customerId}
-                        role="button"
-                        tabIndex={0}
-                        className="cursor-pointer hover:bg-muted/50"
-                        onClick={() => handlePick(u)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") handlePick(u);
-                        }}
-                      >
-                        <TableCell className="font-mono">{u.customerId}</TableCell>
-                        <TableCell>{u.name}</TableCell>
-                        <TableCell className="text-right">{formatCredit(u.credit)}</TableCell>
-                      </TableRow>
-                    ))}
+                  {filtered.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={3}>No users match.</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
 
-                    {filtered.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={3}>No users match.</TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="cursor-pointer"
-                  onClick={() => setDialogOpen(false)}
-                >
-                  Close
-                </Button>
-              </DialogContent>
-            </Dialog>
-          </form>
+              <Button
+                type="button"
+                variant="ghost"
+                className="cursor-pointer"
+                onClick={() => setDialogOpen(false)}
+              >
+                Close
+              </Button>
+            </DialogContent>
+          </Dialog>
         </CardContent>
       </Card>
     </div>
