@@ -4,10 +4,7 @@ import { findUserByCustomerId } from "@/mock/users";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-
-function formatCredit(x: number): string {
-  return x.toFixed(2);
-}
+import { formatCredit } from "@/util/util";
 
 export default function ProtectedLayout() {
   const navigate = useNavigate();
