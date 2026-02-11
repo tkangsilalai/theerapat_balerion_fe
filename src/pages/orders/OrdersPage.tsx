@@ -1,27 +1,12 @@
-import { useNavigate } from "react-router-dom";
-import { getSessionCustomerId, logout } from "@/util/auth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function OrdersPage() {
-  const navigate = useNavigate();
-  const customerId = getSessionCustomerId();
-
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between">
-        <div className="text-lg font-semibold">Welcome {customerId}</div>
-
-        <button
-          className="rounded-lg border px-3 py-1.5 text-sm cursor-pointer hover:bg-gray-100"
-          onClick={() => {
-            logout();
-            navigate("/login", { replace: true });
-          }}
-        >
-          Logout
-        </button>
-      </div>
-
-      {/* TODO: order form + order list */}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Create Order</CardTitle>
+      </CardHeader>
+      <CardContent>TODO: order form + order list</CardContent>
+    </Card>
   );
 }

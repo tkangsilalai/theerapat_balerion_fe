@@ -3,6 +3,7 @@ import { getSessionCustomerId, login } from "@/util/auth";
 import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "@/util/ProtectedRoute";
 import OrdersPage from "./pages/orders/OrdersPage";
+import ProtectedLayout from "./util/ProtectedLayout";
 
 export default function App() {
   return (
@@ -20,7 +21,9 @@ export default function App() {
       />
 
       <Route element={<ProtectedRoute />}>
-        <Route path="/orders" element={<OrdersPage />} />
+        <Route element={<ProtectedLayout />}>
+          <Route path="/orders" element={<OrdersPage />} />
+        </Route>
       </Route>
 
       <Route
