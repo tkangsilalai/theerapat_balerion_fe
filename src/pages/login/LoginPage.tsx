@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { login } from "@/features/auth/auth";
+import { login } from "@/util/auth";
 
 type Props = {
   onLoginSuccess: (customerId: string) => void;
