@@ -1,36 +1,28 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import LoginPage from "./features/auth/LoginPage";
+import { getSessionCustomerId, logout } from "./features/auth/auth";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [customerId, setCustomerId] = useState(() => getSessionCustomerId());
+
+  if (!customerId) {
+    return <LoginPage onLoginSuccess={(id) => setCustomerId(id)} />;
+  }
 
   return (
-    <>
-      <div className="p-6 text-xl font-semibold">Tailwind works</div>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="p-6">
+      <div className="flex items-center justify-between">
+        <div className="text-lg font-semibold">Welcome {customerId}</div>
+        <button
+          className="rounded-lg border px-3 py-1.5 text-sm"
+          onClick={() => {
+            logout();
+            setCustomerId(null);
+          }}
+        >
+          Logout
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
-
-export default App
