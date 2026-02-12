@@ -39,9 +39,7 @@ export default function LoginPage({ onLoginSuccess }: Props) {
   const filtered = useMemo(() => {
     const q = pickQuery.trim().toUpperCase();
     if (!q) return users;
-    return users.filter(
-      (u) => u.customerId.toUpperCase().includes(q) || u.name.toUpperCase().includes(q),
-    );
+    return users.filter((u) => u.customerId.toUpperCase().includes(q));
   }, [pickQuery, users]);
 
   function handlePick(user: User) {
@@ -79,7 +77,7 @@ export default function LoginPage({ onLoginSuccess }: Props) {
               </DialogHeader>
 
               <Input
-                placeholder="Search by CT-XXXX or name…"
+                placeholder="Search by CT-XXXX"
                 value={pickQuery}
                 onChange={(e) => setPickQuery(e.target.value)}
                 autoComplete="off"
@@ -89,7 +87,6 @@ export default function LoginPage({ onLoginSuccess }: Props) {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Customer ID</TableHead>
-                    <TableHead>Name</TableHead>
                     <TableHead className="text-right">Credit</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -107,7 +104,6 @@ export default function LoginPage({ onLoginSuccess }: Props) {
                       }}
                     >
                       <TableCell className="font-mono">{u.customerId}</TableCell>
-                      <TableCell>{u.name}</TableCell>
                       <TableCell className="text-right">{formatCredit(u.credit)}</TableCell>
                     </TableRow>
                   ))}

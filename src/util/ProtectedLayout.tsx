@@ -42,7 +42,7 @@ export default function ProtectedLayout() {
         <Separator className="mt-4" />
       </header>
 
-      <main className="p-6">
+      <main className="p-6 flex items-center justify-center">
         <Outlet />
       </main>
     </div>
