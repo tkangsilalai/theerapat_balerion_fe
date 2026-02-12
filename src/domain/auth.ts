@@ -1,4 +1,4 @@
-import { findUserByCustomerId, type User } from "@/mock/users.ts";
+import { findUserByCustomerId, type User } from "@/domain/user";
 
 const STORAGE_KEY = "session_customer_id";
 

@@ -16,8 +16,11 @@ function roundBankers(value: number, decimals = 2): number {
     return Math.round(n) / factor;
 }
 
-
 export function formatCredit(x: number): string {
     const s = roundBankers(x, 2).toFixed(2);
     return s === "-0.00" ? "0.00" : s;
+}
+
+export function shortId(id: string) {
+    return id.slice(0, 8);
 }

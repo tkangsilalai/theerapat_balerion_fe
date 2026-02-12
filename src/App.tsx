@@ -1,9 +1,9 @@
 import LoginPage from "@/pages/login/LoginPage";
-import { getSessionCustomerId, login } from "@/util/auth";
+import { getSessionCustomerId, login } from "@/domain/auth";
 import { Navigate, Route, Routes } from "react-router-dom";
-import ProtectedRoute from "@/util/ProtectedRoute";
+import ProtectedRoute from "@/components/custom/ProtectedRoute";
 import OrdersPage from "./pages/orders/OrdersPage";
-import ProtectedLayout from "./util/ProtectedLayout";
+import ProtectedLayout from "./components/custom/ProtectedLayout";
 
 export default function App() {
   return (

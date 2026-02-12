@@ -1,6 +1,7 @@
 export type OrderType = "Emergency" | "Overdue" | "Daily";
 
 export type WarehouseStock = {
+    supplierId: string;
     warehouseId: string;
     quantityOfSalmonLeft: number;
     basePricePerUnit: number;
@@ -17,22 +18,22 @@ export const MOCK_SUPPLIERS: Supplier[] = [
         supplierId: "SP-0001",
         priceMultiplierByType: { Emergency: 1.25, Daily: 1.0, Overdue: 0.9 },
         warehouses: [
-            { warehouseId: "WH-0001", quantityOfSalmonLeft: 5000, basePricePerUnit: 12.5 },
-            { warehouseId: "WH-0002", quantityOfSalmonLeft: 1200, basePricePerUnit: 12.2 },
+            { supplierId: "SP-0001", warehouseId: "WH-0001", quantityOfSalmonLeft: 5000, basePricePerUnit: 12.5 },
+            { supplierId: "SP-0001", warehouseId: "WH-0002", quantityOfSalmonLeft: 1200, basePricePerUnit: 12.2 },
         ],
     },
     {
         supplierId: "SP-0002",
         priceMultiplierByType: { Emergency: 1.3, Daily: 1.0, Overdue: 0.92 },
         warehouses: [
-            { warehouseId: "WH-0001", quantityOfSalmonLeft: 9000, basePricePerUnit: 12.8 },
-            { warehouseId: "WH-0003", quantityOfSalmonLeft: 400, basePricePerUnit: 12.0 },
+            { supplierId: "SP-0002", warehouseId: "WH-0001", quantityOfSalmonLeft: 9000, basePricePerUnit: 12.8 },
+            { supplierId: "SP-0002", warehouseId: "WH-0003", quantityOfSalmonLeft: 400, basePricePerUnit: 12.0 },
         ],
     },
     {
         supplierId: "SP-0003",
         priceMultiplierByType: { Emergency: 1.2, Daily: 1.0, Overdue: 0.88 },
-        warehouses: [{ warehouseId: "WH-0002", quantityOfSalmonLeft: 3000, basePricePerUnit: 11.9 }],
+        warehouses: [{ supplierId: "SP-0003", warehouseId: "WH-0002", quantityOfSalmonLeft: 3000, basePricePerUnit: 11.9 }],
     },
 ];
 
@@ -102,4 +103,14 @@ export function getAvailableSalmonLeftForScope(
     );
 
     return warehouse?.quantityOfSalmonLeft ?? 0;
+}
+
+export function buildInitialInventoryFromMock(): WarehouseStock[] {
+    const inventory: WarehouseStock[] = [];
+    for (const supplier of MOCK_SUPPLIERS) {
+        for (const warehouse of supplier.warehouses) {
+            inventory.push({ ...warehouse });
+        }
+    }
+    return inventory;
 }

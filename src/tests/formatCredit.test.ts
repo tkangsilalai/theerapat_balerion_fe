@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatCredit } from "@/util/util";
+import { formatCredit } from "@/domain/util";
 
 const cases: Array<[number, number]> = [
     // ties (banker's rounding)

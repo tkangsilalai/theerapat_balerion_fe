@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { listUsers, type User } from "@/mock/users";
+import { listUsers, type User } from "@/domain/user";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { login } from "@/util/auth";
+import { login } from "@/domain/auth";
 
 type Props = {
   onLoginSuccess: (customerId: string) => void;

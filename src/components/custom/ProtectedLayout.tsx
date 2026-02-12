@@ -1,10 +1,10 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import { logout, getSessionCustomerId } from "@/util/auth";
-import { findUserByCustomerId } from "@/mock/users";
+import { logout, getSessionCustomerId } from "@/domain/auth";
+import { findUserByCustomerId } from "@/domain/user";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { formatCredit } from "@/util/util";
+import { formatCredit } from "@/domain/util";
 
 export default function ProtectedLayout() {
   const navigate = useNavigate();
