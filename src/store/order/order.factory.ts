@@ -1,4 +1,5 @@
-import type { Order, OrderType } from "@/domain/order";
+import type { Order } from "@/domain/order";
+import type { OrderType } from "@/domain/orderType";
 
 export function makeOrder(params: {
     customerId: string;

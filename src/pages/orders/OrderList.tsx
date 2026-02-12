@@ -12,10 +12,12 @@ import {
 
 import type { Order } from "@/domain/order";
 import { formatCredit, shortId } from "@/domain/util";
+import { OrderStatus } from "@/domain/orderType";
 
 type Props = {
   orders: Order[];
   onRefreshAssign?: () => void;
+  onDeleteOrder?: (orderId: Order["id"]) => void;
 };
 
 function statusBadgeVariant(status: Order["status"]): "default" | "secondary" | "destructive" {
@@ -24,7 +26,7 @@ function statusBadgeVariant(status: Order["status"]): "default" | "secondary" | 
   return "secondary"; // InProgress
 }
 
-export default function OrderList({ orders, onRefreshAssign }: Props) {
+export default function OrderList({ orders, onRefreshAssign, onDeleteOrder }: Props) {
   return (
     <Card className="w-4/5 max-w-3xl">
       <CardHeader>
@@ -50,6 +52,7 @@ export default function OrderList({ orders, onRefreshAssign }: Props) {
                 <TableHead>Status</TableHead>
                 <TableHead>Reason</TableHead>
                 <TableHead className="text-right">Total</TableHead>
+                <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -66,12 +69,26 @@ export default function OrderList({ orders, onRefreshAssign }: Props) {
                   <TableCell className="text-right">
                     {typeof o.totalPrice === "number" ? formatCredit(o.totalPrice) : "-"}
                   </TableCell>
+                  <TableCell className="text-right">
+                    {onDeleteOrder && o.status == OrderStatus.IN_PROGRESS ? (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => onDeleteOrder(o.id)}
+                      >
+                        Delete
+                      </Button>
+                    ) : (
+                      "-"
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
 
               {orders.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6}>No orders yet.</TableCell>
+                  <TableCell colSpan={7}>No orders yet.</TableCell>
                 </TableRow>
               ) : null}
             </TableBody>

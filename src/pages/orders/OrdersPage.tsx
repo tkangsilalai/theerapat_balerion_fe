@@ -5,13 +5,11 @@ import { OrderActionType, orderReducer } from "@/store/order/order.reducer";
 import { loadState } from "@/store/order/order.storage";
 import { buildInitialInventoryFromMock } from "@/domain/supplierWarehouse";
 import { type Order } from "@/domain/order";
-import { getSessionCustomerId } from "@/domain/session";
-import { findUserByCustomerId } from "@/domain/user";
 import { assignOrders } from "@/domain/assignOrders";
+import { useUser } from "@/store/user/useUser";
 
 export default function OrdersPage() {
-  const customerId = getSessionCustomerId()!;
-  const user = findUserByCustomerId(customerId)!;
+  const { userCredit: currentUserCredit, setUserCredit } = useUser();
 
   const [orderState, orderDispatch] = useReducer(orderReducer, undefined, () => {
     return (
@@ -31,8 +29,10 @@ export default function OrdersPage() {
     const { orders, inventory, userCredit } = assignOrders({
       orders: orderState.orders,
       inventory: orderState.inventory,
-      userCredit: user.credit,
+      userCredit: currentUserCredit,
     });
+
+    setUserCredit(userCredit);
 
     orderDispatch({
       type: OrderActionType.ORDERS_ASSIGNED,
@@ -44,7 +44,11 @@ export default function OrdersPage() {
   return (
     <div className="w-full justify-center flex">
       <OrderForm onCreateOrder={handleCreateOrder} />
-      <OrderList orders={orderState.orders} onRefreshAssign={handleRefreshAssign} />
+      <OrderList
+        orders={orderState.orders}
+        onRefreshAssign={handleRefreshAssign}
+        onDeleteOrder={(orderId) => orderDispatch({ type: OrderActionType.ORDER_DELETED, orderId })}
+      />
     </div>
   );
 }

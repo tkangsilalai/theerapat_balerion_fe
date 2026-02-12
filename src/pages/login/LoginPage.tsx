@@ -18,10 +18,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { login } from "@/domain/auth";
+import { useUser } from "@/store/user/useUser";
 
 type Props = {
-  onLoginSuccess: (customerId: string) => void;
+  onLoginSuccess: () => void;
 };
 
 function formatCredit(x: number): string {
@@ -30,6 +30,7 @@ function formatCredit(x: number): string {
 
 export default function LoginPage({ onLoginSuccess }: Props) {
   const [error, setError] = useState<string | null>(null);
+  const { login } = useUser();
 
   const [pickQuery, setPickQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -48,7 +49,7 @@ export default function LoginPage({ onLoginSuccess }: Props) {
 
     try {
       login(user.customerId);
-      onLoginSuccess(user.customerId);
+      onLoginSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     }
