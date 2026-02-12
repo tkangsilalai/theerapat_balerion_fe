@@ -1,7 +1,4 @@
-export type OrderType = "Emergency" | "Overdue" | "Daily";
-export type OrderStatus = "InProgress" | "Success" | "Failed";
-
-export type OrderFailReason = "InsufficientCredit" | "InsufficientQuantity";
+import { OrderFailReason, OrderStatus, OrderType } from "./orderType";
 
 export type OrderAllocation = {
     supplierId: string;

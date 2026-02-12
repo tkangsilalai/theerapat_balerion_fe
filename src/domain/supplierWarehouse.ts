@@ -1,4 +1,4 @@
-export type OrderType = "Emergency" | "Overdue" | "Daily";
+import { OrderType } from "./orderType";
 
 export type WarehouseStock = {
     supplierId: string;
@@ -16,7 +16,7 @@ export type Supplier = {
 export const MOCK_SUPPLIERS: Supplier[] = [
     {
         supplierId: "SP-0001",
-        priceMultiplierByType: { Emergency: 1.25, Daily: 1.0, Overdue: 0.9 },
+        priceMultiplierByType: { [OrderType.EMERGENCY]: 1.25, [OrderType.DAILY]: 1.0, [OrderType.OVERDUE]: 0.9 },
         warehouses: [
             { supplierId: "SP-0001", warehouseId: "WH-0001", quantityOfSalmonLeft: 5000, basePricePerUnit: 12.5 },
             { supplierId: "SP-0001", warehouseId: "WH-0002", quantityOfSalmonLeft: 1200, basePricePerUnit: 12.2 },
@@ -24,7 +24,7 @@ export const MOCK_SUPPLIERS: Supplier[] = [
     },
     {
         supplierId: "SP-0002",
-        priceMultiplierByType: { Emergency: 1.3, Daily: 1.0, Overdue: 0.92 },
+        priceMultiplierByType: { [OrderType.EMERGENCY]: 1.3, [OrderType.DAILY]: 1.0, [OrderType.OVERDUE]: 0.92 },
         warehouses: [
             { supplierId: "SP-0002", warehouseId: "WH-0001", quantityOfSalmonLeft: 9000, basePricePerUnit: 12.8 },
             { supplierId: "SP-0002", warehouseId: "WH-0003", quantityOfSalmonLeft: 400, basePricePerUnit: 12.0 },
@@ -32,7 +32,7 @@ export const MOCK_SUPPLIERS: Supplier[] = [
     },
     {
         supplierId: "SP-0003",
-        priceMultiplierByType: { Emergency: 1.2, Daily: 1.0, Overdue: 0.88 },
+        priceMultiplierByType: { [OrderType.EMERGENCY]: 1.2, [OrderType.DAILY]: 1.0, [OrderType.OVERDUE]: 0.88 },
         warehouses: [{ supplierId: "SP-0003", warehouseId: "WH-0002", quantityOfSalmonLeft: 3000, basePricePerUnit: 11.9 }],
     },
 ];

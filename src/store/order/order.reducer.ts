@@ -6,11 +6,18 @@ export type OrderState = {
     inventory: WarehouseStock[];
 };
 
-export type Action =
+export const OrderActionType = {
+    ORDER_CREATED: "ORDER_CREATED",
+    ORDERS_ASSIGNED: "ORDERS_ASSIGNED",
+} as const;
+
+export type OrderActionType = (typeof OrderActionType)[keyof typeof OrderActionType];
+
+export type OrderAction =
     | { type: "ORDER_CREATED"; order: Order }
     | { type: "ORDERS_ASSIGNED"; orders: Order[]; inventory: WarehouseStock[] };
 
-export function orderReducer(state: OrderState, action: Action): OrderState {
+export function orderReducer(state: OrderState, action: OrderAction): OrderState {
     switch (action.type) {
         case "ORDER_CREATED":
             return { ...state, orders: [action.order, ...state.orders] };

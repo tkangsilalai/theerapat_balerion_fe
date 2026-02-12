@@ -32,8 +32,11 @@ import {
 import ComboboxField from "@/components/custom/comboboxField";
 import { getSessionCustomerId } from "@/domain/session";
 import { makeOrder } from "@/store/order/order.factory";
-
-const OrderTypeSchema = z.enum(["Emergency", "Overdue", "Daily"]).or(z.literal(""));
+import { type Order } from "@/domain/order";
+import { OrderType } from "@/domain/orderType";
+const OrderTypeSchema = z
+  .enum([OrderType.EMERGENCY, OrderType.OVERDUE, OrderType.DAILY])
+  .or(z.literal(""));
 
 const FormSchema = z.object({
   salmonQuantity: z.number().int().positive().min(1, "Quantity must be at least 1"),
@@ -44,11 +47,7 @@ const FormSchema = z.object({
 
 type FormValues = z.infer<typeof FormSchema>;
 
-export default function OrderForm({
-  onCreateOrder,
-}: {
-  onCreateOrder: (input: { type: "ORDER_CREATED"; order: ReturnType<typeof makeOrder> }) => void;
-}) {
+export default function OrderForm({ onCreateOrder }: { onCreateOrder: (input: Order) => void }) {
   const customerId = getSessionCustomerId();
   const suppliers = useMemo(() => listSuppliers(), []);
 
@@ -106,7 +105,7 @@ export default function OrderForm({
       orderType: payload.orderType,
     });
 
-    onCreateOrder({ type: "ORDER_CREATED", order });
+    onCreateOrder(order);
   }
 
   return (
