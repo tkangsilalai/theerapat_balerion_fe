@@ -1,5 +1,5 @@
 import LoginPage from "@/pages/login/LoginPage";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import ProtectedRoute from "@/components/custom/ProtectedRoute";
 import OrdersPage from "./pages/orders/OrdersPage";
 import ProtectedLayout from "./components/custom/ProtectedLayout";
@@ -7,21 +7,23 @@ import { UserProvider } from "./store/user/UserContext";
 import { getSessionCustomerId } from "./store/user/session";
 import { OrderProvider } from "./store/order/OrderContext";
 
+function LoginRoute() {
+  const navigate = useNavigate();
+  return (
+    <LoginPage
+      onLoginSuccess={() => {
+        navigate("/orders", { replace: true });
+      }}
+    />
+  );
+}
+
 export default function App() {
   return (
     <UserProvider>
       <OrderProvider>
         <Routes>
-          <Route
-            path="/login"
-            element={
-              <LoginPage
-                onLoginSuccess={() => {
-                  window.location.href = "/orders";
-                }}
-              />
-            }
-          />
+          <Route path="/login" element={<LoginRoute />} />
 
           <Route element={<ProtectedRoute />}>
             <Route element={<ProtectedLayout />}>
