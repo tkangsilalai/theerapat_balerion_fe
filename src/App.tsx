@@ -4,42 +4,45 @@ import ProtectedRoute from "@/components/custom/ProtectedRoute";
 import OrdersPage from "./pages/orders/OrdersPage";
 import ProtectedLayout from "./components/custom/ProtectedLayout";
 import { UserProvider } from "./store/user/UserContext";
-import { getSessionCustomerId } from "./domain/session";
+import { getSessionCustomerId } from "./store/user/session";
+import { OrderProvider } from "./store/order/OrderContext";
 
 export default function App() {
   return (
     <UserProvider>
-      <Routes>
-        <Route
-          path="/login"
-          element={
-            <LoginPage
-              onLoginSuccess={() => {
-                window.location.href = "/orders";
-              }}
-            />
-          }
-        />
+      <OrderProvider>
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <LoginPage
+                onLoginSuccess={() => {
+                  window.location.href = "/orders";
+                }}
+              />
+            }
+          />
 
-        <Route element={<ProtectedRoute />}>
-          <Route element={<ProtectedLayout />}>
-            <Route path="/orders" element={<OrdersPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<ProtectedLayout />}>
+              <Route path="/orders" element={<OrdersPage />} />
+            </Route>
           </Route>
-        </Route>
 
-        <Route
-          path="/"
-          element={
-            getSessionCustomerId() ? (
-              <Navigate to="/orders" replace />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
+          <Route
+            path="/"
+            element={
+              getSessionCustomerId() ? (
+                <Navigate to="/orders" replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </OrderProvider>
     </UserProvider>
   );
 }

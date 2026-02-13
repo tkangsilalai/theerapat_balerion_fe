@@ -1,5 +1,10 @@
 import type { Order } from "@/domain/order";
-import type { WarehouseStock } from "@/domain/supplierWarehouse";
+import { buildInitialInventoryFromMock, type WarehouseStock } from "@/domain/supplierWarehouse";
+
+export const initialOrderState: OrderState = {
+    orders: [],
+    inventory: buildInitialInventoryFromMock(),
+}
 
 export type OrderState = {
     orders: Order[];
@@ -10,6 +15,7 @@ export const OrderActionType = {
     ORDER_CREATED: "ORDER_CREATED",
     ORDERS_ASSIGNED: "ORDERS_ASSIGNED",
     ORDER_DELETED: "ORDER_DELETED",
+    RESET: "RESET",
 } as const;
 
 export type OrderActionType = (typeof OrderActionType)[keyof typeof OrderActionType];
@@ -17,7 +23,8 @@ export type OrderActionType = (typeof OrderActionType)[keyof typeof OrderActionT
 export type OrderAction =
     | { type: "ORDER_CREATED"; order: Order }
     | { type: "ORDERS_ASSIGNED"; orders: Order[]; inventory: WarehouseStock[] }
-    | { type: "ORDER_DELETED"; orderId: Order["id"] };
+    | { type: "ORDER_DELETED"; orderId: Order["id"] }
+    | { type: "RESET" };
 
 export function orderReducer(state: OrderState, action: OrderAction): OrderState {
     switch (action.type) {
@@ -29,6 +36,9 @@ export function orderReducer(state: OrderState, action: OrderAction): OrderState
 
         case "ORDER_DELETED":
             return { ...state, orders: state.orders.filter((o) => o.id !== action.orderId) };
+
+        case "RESET":
+            return initialOrderState;
 
         default:
             return state;

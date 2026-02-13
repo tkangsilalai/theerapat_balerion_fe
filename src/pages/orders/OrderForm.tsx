@@ -26,15 +26,16 @@ import {
 import { useMemo } from "react";
 import {
   getAvailableSalmonLeftForScope,
-  listSuppliers,
-  listSupplierWarehouses,
+  listSuppliersFromInventory,
+  listSupplierWarehousesFromInventory,
 } from "@/domain/supplierWarehouse";
 import ComboboxField from "@/components/custom/comboboxField";
-import { getSessionCustomerId } from "@/domain/session";
+import { getSessionCustomerId } from "@/store/user/session";
 import { makeOrder } from "@/store/order/order.factory";
 import { type Order } from "@/domain/order";
 import { OrderType } from "@/domain/orderType";
 import { generateOrders } from "@/domain/generateOrders";
+import { useOrder } from "@/store/order/useOrder";
 const OrderTypeSchema = z
   .enum([OrderType.EMERGENCY, OrderType.OVERDUE, OrderType.DAILY])
   .or(z.literal(""));
@@ -49,8 +50,11 @@ const FormSchema = z.object({
 type FormValues = z.infer<typeof FormSchema>;
 
 export default function OrderForm({ onCreateOrder }: { onCreateOrder: (input: Order) => void }) {
+  const { state } = useOrder();
+  const inventory = state.inventory;
+
   const customerId = getSessionCustomerId();
-  const suppliers = useMemo(() => listSuppliers(), []);
+  const suppliers = useMemo(() => listSuppliersFromInventory(inventory), [inventory]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -69,8 +73,8 @@ export default function OrderForm({ onCreateOrder }: { onCreateOrder: (input: Or
 
   const supplierWarehouses = useMemo(() => {
     if (!selectedSupplierId) return [];
-    return listSupplierWarehouses(selectedSupplierId) ?? [];
-  }, [selectedSupplierId]);
+    return listSupplierWarehousesFromInventory(selectedSupplierId, inventory) ?? [];
+  }, [selectedSupplierId, inventory]);
 
   function onSubmit(values: FormValues) {
     const payload = {
@@ -79,7 +83,11 @@ export default function OrderForm({ onCreateOrder }: { onCreateOrder: (input: Or
       warehouseId: values.warehouseId?.trim() ? values.warehouseId.trim() : undefined,
     };
 
-    const totalAvailable = getAvailableSalmonLeftForScope(payload.supplierId, payload.warehouseId);
+    const totalAvailable = getAvailableSalmonLeftForScope(
+      inventory,
+      payload.supplierId,
+      payload.warehouseId,
+    );
 
     if (payload.salmonQuantity > totalAvailable) {
       form.setError("salmonQuantity", {
@@ -97,7 +105,6 @@ export default function OrderForm({ onCreateOrder }: { onCreateOrder: (input: Or
       return;
     }
 
-    console.log("Create order:", payload);
     const order = makeOrder({
       customerId: customerId!,
       salmonQuantity: payload.salmonQuantity,
@@ -162,7 +169,10 @@ export default function OrderForm({ onCreateOrder }: { onCreateOrder: (input: Or
                     }}
                     placeholder="Select a supplier"
                     searchPlaceholder="Search suppliers..."
-                    items={suppliers.map((s) => ({ value: s.supplierId }))}
+                    items={suppliers.map((s) => ({
+                      value: s.supplierId,
+                      label: `${s.supplierId} • Qty: ${s.totalSalmonLeft}`,
+                    }))}
                     disabled={suppliers.length === 0}
                   />
                   <FormMessage />
@@ -181,7 +191,12 @@ export default function OrderForm({ onCreateOrder }: { onCreateOrder: (input: Or
                     onChange={field.onChange}
                     placeholder="Select a warehouse"
                     searchPlaceholder="Search warehouses..."
-                    items={supplierWarehouses?.map((w) => ({ value: w.warehouseId })) ?? []}
+                    items={
+                      supplierWarehouses?.map((w) => ({
+                        value: w.warehouseId,
+                        label: `${w.warehouseId} • Qty: ${w.quantityOfSalmonLeft}`,
+                      })) ?? []
+                    }
                     disabled={supplierWarehouses?.length === 0}
                   />
                   <FormMessage />

@@ -6,10 +6,11 @@ import {
   getSessionUserCredit,
   setSessionUserCredit,
   clearSessionUser,
-} from "@/domain/session";
-import {} from "@/domain/session";
+} from "@/store/user/session";
+import {} from "@/store/user/session";
 import { findUserByCustomerId } from "@/domain/user";
 import { UserContext } from "./user.context";
+import { clearState as clearOrderState } from "../order/order.storage";
 
 export function UserProvider({ children }: { initialCredit?: number; children: React.ReactNode }) {
   const [customerId, setCustomerIdState] = useState<string | null>(() => getSessionCustomerId());
@@ -39,7 +40,10 @@ export function UserProvider({ children }: { initialCredit?: number; children: R
 
   const logout = useCallback(() => {
     clearSessionUser();
-  }, []);
+    if (customerId) clearOrderState(customerId);
+    setCustomerIdState(null);
+    setUserCreditState(initialCredit);
+  }, [customerId, initialCredit]);
 
   const value = useMemo(
     () => ({

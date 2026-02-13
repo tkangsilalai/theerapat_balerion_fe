@@ -1,5 +1,5 @@
 import type { Order, OrderAllocation } from "./order";
-import { findSupplier, type WarehouseStock } from "./supplierWarehouse";
+import { findSupplierFromInventory, type WarehouseStock } from "./supplierWarehouse";
 
 function getCandidates(order: Order, inventory: WarehouseStock[]): WarehouseStock[] {
     return inventory.filter((w) => {
@@ -30,7 +30,7 @@ export function pickAllocations(
         const take = Math.min(remaining, w.quantityOfSalmonLeft);
         if (take <= 0) continue;
 
-        const supplier = findSupplier(w.supplierId);
+        const supplier = findSupplierFromInventory(w.supplierId, inventory);
         if (!supplier) continue;
 
         const unitPrice = w.basePricePerUnit * supplier.priceMultiplierByType[order.orderType];

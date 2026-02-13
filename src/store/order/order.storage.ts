@@ -1,12 +1,23 @@
 import type { OrderState } from "./order.reducer";
 
-const STORAGE_KEY = "order_state";
+const KEY_PREFIX = "order_state_v1";
 
-export function loadState(): OrderState | null {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
+const keyFor = (customerId: string) => `${KEY_PREFIX}:${customerId?.trim().toUpperCase()}`;
+
+export function loadState(customerId: string): OrderState | null {
+    const raw = localStorage.getItem(keyFor(customerId));
+    if (!raw) return null;
+    try {
+        return JSON.parse(raw) as OrderState;
+    } catch {
+        return null;
+    }
 }
 
-export function saveState(state: OrderState) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+export function saveState(customerId: string, state: OrderState) {
+    localStorage.setItem(keyFor(customerId), JSON.stringify(state));
+}
+
+export function clearState(customerId: string) {
+    localStorage.removeItem(keyFor(customerId));
 }

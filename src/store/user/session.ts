@@ -1,5 +1,5 @@
-const CUSTOMER_KEY = "session_customer_id";
-const CREDIT_KEY = "session_user_credit";
+const CUSTOMER_KEY = "session_customer_id_v1";
+const CREDIT_KEY = "session_user_credit_v1";
 
 // Customer ID
 export function setSessionCustomerId(id: string) {

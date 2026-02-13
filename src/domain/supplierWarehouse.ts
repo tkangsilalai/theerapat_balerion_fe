@@ -37,29 +37,8 @@ export const MOCK_SUPPLIERS: Supplier[] = [
     },
 ];
 
-export function listSuppliers(): Supplier[] {
+function listSuppliers(): Supplier[] {
     return MOCK_SUPPLIERS;
-}
-
-export function findSupplier(supplierId: string): Supplier | null {
-    const id = supplierId.trim().toUpperCase();
-    return MOCK_SUPPLIERS.find((s) => s.supplierId === id) ?? null;
-}
-
-export function listSupplierWarehouses(supplierId: string): WarehouseStock[] | null {
-    const s = findSupplier(supplierId);
-    if (!s) return null;
-    return s.warehouses;
-}
-
-export function findWarehouseInSupplier(
-    supplierId: string,
-    warehouseId: string,
-): WarehouseStock | null {
-    const s = findSupplier(supplierId);
-    if (!s) return null;
-    const wid = warehouseId.trim().toUpperCase();
-    return s.warehouses.find((w) => w.warehouseId === wid) ?? null;
 }
 
 export function unitPriceFor(
@@ -71,39 +50,30 @@ export function unitPriceFor(
     return warehouse.basePricePerUnit * m;
 }
 
-function getTotalSalmonLeft(): number {
-    return listSuppliers().reduce((sum, s) => {
-        return (
-            sum +
-            s.warehouses.reduce((ws, w) => ws + w.quantityOfSalmonLeft, 0)
-        );
-    }, 0);
-}
-
 export function getAvailableSalmonLeftForScope(
+    inventory: WarehouseStock[],
     supplierId?: string,
     warehouseId?: string
 ): number {
     if (!supplierId) {
-        return getTotalSalmonLeft();
+        return inventory.reduce((sum, w) => sum + w.quantityOfSalmonLeft, 0);
     }
-
-    const supplier = findSupplier(supplierId);
-    if (!supplier) return 0;
 
     if (!warehouseId) {
-        return supplier.warehouses.reduce(
-            (sum, w) => sum + w.quantityOfSalmonLeft,
-            0
-        );
+        return inventory
+            .filter((w) => w.supplierId === supplierId)
+            .reduce((sum, w) => sum + w.quantityOfSalmonLeft, 0);
     }
 
-    const warehouse = supplier.warehouses.find(
-        (w) => w.warehouseId === warehouseId
+    const warehouse = inventory.find(
+        (w) =>
+            w.supplierId === supplierId &&
+            w.warehouseId === warehouseId
     );
 
     return warehouse?.quantityOfSalmonLeft ?? 0;
 }
+
 
 export function buildInitialInventoryFromMock(): WarehouseStock[] {
     const inventory: WarehouseStock[] = [];
@@ -113,4 +83,70 @@ export function buildInitialInventoryFromMock(): WarehouseStock[] {
         }
     }
     return inventory;
+}
+
+export function listSupplierWarehousesFromInventory(
+    supplierId: string,
+    inventory: WarehouseStock[],
+): WarehouseStock[] {
+    const sid = supplierId.trim().toUpperCase();
+    return inventory.filter((w) => w.supplierId === sid);
+}
+
+export function findWarehouseInInventory(
+    supplierId: string,
+    warehouseId: string,
+    inventory: WarehouseStock[],
+): WarehouseStock | null {
+    const sid = supplierId.trim().toUpperCase();
+    const wid = warehouseId.trim().toUpperCase();
+    return inventory.find((w) => w.supplierId === sid && w.warehouseId === wid) ?? null;
+}
+
+export type SupplierWithTotals = Supplier & {
+    totalSalmonLeft: number;
+};
+
+export function listSuppliersFromInventory(
+    inventory: WarehouseStock[],
+): SupplierWithTotals[] {
+    const ids = listSuppliers().map((s) => s.supplierId);
+
+    return ids.map((supplierId) => {
+        const meta = MOCK_SUPPLIERS.find((s) => s.supplierId === supplierId);
+        const warehouses = inventory.filter((w) => w.supplierId === supplierId);
+        const totalSalmonLeft = warehouses.reduce((sum, w) => sum + w.quantityOfSalmonLeft, 0);
+
+        return {
+            supplierId,
+            priceMultiplierByType: meta?.priceMultiplierByType ?? {
+                Emergency: 1,
+                Daily: 1,
+                Overdue: 1,
+            },
+            warehouses,
+            totalSalmonLeft,
+        };
+    });
+}
+
+
+export function findSupplierFromInventory(
+    supplierId: string,
+    inventory: WarehouseStock[],
+): Supplier | null {
+    const warehouses = inventory.filter((w) => w.supplierId === supplierId);
+    if (warehouses.length === 0) return null;
+
+    const meta = MOCK_SUPPLIERS.find((s) => s.supplierId === supplierId);
+
+    return {
+        supplierId: supplierId,
+        priceMultiplierByType: meta?.priceMultiplierByType ?? {
+            Emergency: 1,
+            Daily: 1,
+            Overdue: 1,
+        },
+        warehouses,
+    };
 }
