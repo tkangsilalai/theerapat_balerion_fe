@@ -1,73 +1,58 @@
-# React + TypeScript + Vite
+# Theerapat K. — Balerion Frontend Assignment
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is deployed on Vercel and can be accessed at:
+https://theerapat-balerion-fe.vercel.app/
 
-Currently, two official plugins are available:
+## 1) Login Page
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![LoginPage](docs/images/LoginPage.png)
 
-## React Compiler
+There is no real authentication in this assignment yet. To log in, you simply select a user.  
+All user state is reset on logout.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Click **“Pick Customer”** to open a popup and select a user:
 
-## Expanding the ESLint configuration
+![UserListPopup](docs/images/UserListPopup.png)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 2) Orders Page
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+After selecting a user, the app redirects to `/orders`.  
+The top bar shows the customer ID and the user’s remaining credit, along with a **Logout** button.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+![OrdersPage](docs/images/OrdersPage.png)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Creating orders
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The left **Create Order** panel is used to create new orders.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- If **no supplier** or **warehouse** is selected, the system allocates salmon from warehouses with the highest available stock first (and applies the price multiplier based on the selected order type).
+- You can also place **5,000 orders** with the same parameters to stress-test the UI. To reduce render overhead, the orders table (right panel) uses **virtualized rendering**.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Assigning orders
+
+Click **Refresh / Assign** to assign salmon to all **InProgress** orders.  
+Orders will become **Success** or **Failed** depending on:
+
+- available salmon quantity
+- user credit
+
+When multiple orders are assigned, the priority is:
+**Emergency → Overdue → Daily**  
+If the order type is the same, it falls back to **FIFO** (by `createdAt` timestamp).
+
+After assignment, both **user** and **order** state are updated. All state is cleared on **Logout**.
+
+![OrderedOrdersPage](docs/images/OrderedOrdersPage.png)
+
+Example of an insufficient quantity failure:
+
+![InsufficientQuantity](docs/images/InsufficientQuantity.png)
+
+The supplier dropdown also displays the current available salmon quantity (based on inventory state), so users can estimate whether an order is likely to fail.
+
+![SupplierList](docs/images/SupplierList.png)
+
+## How to run locally
+
+1. `npm install`
+2. `npm run dev`
