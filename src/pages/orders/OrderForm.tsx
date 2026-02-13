@@ -116,14 +116,36 @@ export default function OrderForm({ onCreateOrder }: { onCreateOrder: (input: Or
     onCreateOrder(order);
   }
 
-  const place5000 = () => {
+  const place5000 = (
+    type: OrderType,
+    quantity: number,
+    supplierId?: string,
+    warehouseId?: string,
+  ) => {
     if (!customerId) return;
 
-    const batch = generateOrders(5000, customerId);
+    const batch = generateOrders(5000, customerId, type, quantity, supplierId, warehouseId);
 
     for (const order of batch) {
       onCreateOrder(order);
     }
+  };
+
+  const onPlace5000Click = () => {
+    const orderType = form.getValues().orderType;
+    const salmonQuantity = form.getValues().salmonQuantity;
+    const supplierId = form.getValues().supplierId;
+    const warehouseId = form.getValues().warehouseId;
+
+    if (!orderType) {
+      form.setError("orderType", {
+        type: "manual",
+        message: "Please select an order type before placing 5,000 orders.",
+      });
+      return;
+    }
+
+    place5000(orderType as OrderType, salmonQuantity, supplierId, warehouseId);
   };
 
   return (
@@ -231,7 +253,7 @@ export default function OrderForm({ onCreateOrder }: { onCreateOrder: (input: Or
               Place Order
             </Button>
             <hr className="my-4" />
-            <Button type="button" className="cursor-pointer" onClick={place5000}>
+            <Button type="button" className="cursor-pointer" onClick={onPlace5000Click}>
               Place 5,000 Order
             </Button>
           </form>
