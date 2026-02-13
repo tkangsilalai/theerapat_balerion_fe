@@ -337,5 +337,37 @@ describe("assignOrders()", () => {
         expect(out.orders.find((x) => x.id === "D1")!.status).toBe(OrderStatus.FAILED);
         expect(out.orders.find((x) => x.id === "D1")!.failReason).toBe(OrderFailReason.INSUFFICIENT_CREDIT);
     });
+});
 
+function genOrders(n: number) {
+    return Array.from({ length: n }, (_, i) => ({
+        id: `O-${i}`,
+        status: OrderStatus.IN_PROGRESS,
+        salmonQuantity: 1,
+        createdAt: i,
+        customerId: "CT-0001",
+        orderType: i % 3 === 0 ? OrderType.EMERGENCY : i % 3 === 1 ? OrderType.OVERDUE : OrderType.DAILY,
+        allocations: [],
+    }));
+}
+
+function genInventory() {
+    return [{ supplierId: "S1", warehouseId: "W1", quantityOfSalmonLeft: 100000, basePricePerUnit: 1 }];
+}
+
+describe("assignOrders stress", () => {
+    it("handles 6000 orders under reasonable time", () => {
+        const orders = genOrders(6000);
+        const inventory = genInventory();
+        const userCredit = 100000;
+
+        const t0 = performance.now();
+        const out = assignOrders({ orders, inventory, userCredit });
+        const t1 = performance.now();
+
+        expect(out.orders.length).toBe(6000);
+        expect(out.inventory[0].quantityOfSalmonLeft).toBeLessThanOrEqual(100000);
+
+        expect(t1 - t0).toBeLessThan(500);
+    });
 });

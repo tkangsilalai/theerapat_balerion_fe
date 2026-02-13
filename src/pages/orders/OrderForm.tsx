@@ -34,6 +34,7 @@ import { getSessionCustomerId } from "@/domain/session";
 import { makeOrder } from "@/store/order/order.factory";
 import { type Order } from "@/domain/order";
 import { OrderType } from "@/domain/orderType";
+import { generateOrders } from "@/domain/generateOrders";
 const OrderTypeSchema = z
   .enum([OrderType.EMERGENCY, OrderType.OVERDUE, OrderType.DAILY])
   .or(z.literal(""));
@@ -107,6 +108,16 @@ export default function OrderForm({ onCreateOrder }: { onCreateOrder: (input: Or
 
     onCreateOrder(order);
   }
+
+  const place5000 = () => {
+    if (!customerId) return;
+
+    const batch = generateOrders(5000, customerId);
+
+    for (const order of batch) {
+      onCreateOrder(order);
+    }
+  };
 
   return (
     <Card className="w-1/5 max-w-3xl">
@@ -203,6 +214,10 @@ export default function OrderForm({ onCreateOrder }: { onCreateOrder: (input: Or
 
             <Button type="submit" className="cursor-pointer">
               Place Order
+            </Button>
+            <hr className="my-4" />
+            <Button type="button" className="cursor-pointer" onClick={place5000}>
+              Place 5,000 Order
             </Button>
           </form>
         </Form>
