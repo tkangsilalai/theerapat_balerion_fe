@@ -12,7 +12,7 @@ type Props = {
 
 export default function OrderList({ orders, onRefreshAssign, onDeleteOrder }: Props) {
   return (
-    <Card className="w-4/5 max-w-3xl">
+    <Card className="w-full lg:w-4/5 max-w-3xl">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Orders</CardTitle>

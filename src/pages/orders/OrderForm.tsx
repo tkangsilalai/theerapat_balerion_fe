@@ -149,7 +149,7 @@ export default function OrderForm({ onCreateOrder }: { onCreateOrder: (input: Or
   };
 
   return (
-    <Card className="w-1/5 max-w-3xl">
+    <Card className="w-full lg:w-1/5 max-w-3xl">
       <CardHeader>
         <CardTitle>Create Order</CardTitle>
       </CardHeader>

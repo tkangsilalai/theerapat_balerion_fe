@@ -44,7 +44,7 @@ export default function OrdersPage() {
   }, [handleRefreshAssign]);
 
   return (
-    <div className="w-full justify-center flex">
+    <div className="w-full flex flex-col lg:flex-row justify-center gap-6">
       <OrderForm onCreateOrder={handleCreateOrder} />
       <OrderList
         orders={orderState.orders}
